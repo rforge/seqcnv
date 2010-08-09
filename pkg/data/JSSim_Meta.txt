@@ -1,0 +1,5 @@
+File	Sample	Type
+JSSim_NormalSim1.txt	JSSim_N	Normal
+JSSim_NormalSim2.txt	JSSim_N	Normal
+JSSim_TumorSim1.txt	JSSim_T	Tumor
+JSSim_TumorSim2.txt	JSSim_T	Tumor
