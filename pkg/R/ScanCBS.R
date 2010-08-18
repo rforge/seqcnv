@@ -1,5 +1,5 @@
 ScanCBS <-
-function(cases, controls, statistic="binomial", grid.size="auto", takeN=5, maxNCut=100, minStat=5, verbose=FALSE, timing=TRUE) {
+function(cases, controls, statistic="binomial", grid.size="auto", takeN=5, maxNCut=100, minStat=0, verbose=FALSE, timing=TRUE) {
 	## statistic should be either "binomial" (use exact binomial distribution)
 	## "normal" (use normal approximation for all windows), or "rabinowitz" (use statistic in Rabinowitz 1994)
 	## grid.size should be either "auto" (default) or a vector of integers such as c(10000,1000,100,10)

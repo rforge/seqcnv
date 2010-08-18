@@ -1,7 +1,7 @@
 Package: seqCBS
 Type: Package
 Title: CN Profiling using Sequencing and CBS
-Version: 1.0
+Version: 1.1
 Date: 2010-04-27
 Author: Jeremy J. Shen, Nancy R. Zhang
 Maintainer: Jeremy J. Shen <jqshen@stanford.edu>

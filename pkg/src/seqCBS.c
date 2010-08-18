@@ -149,10 +149,15 @@ SEXP ScanStatNewCompBinomC(SEXP combZCumSumS, SEXP combXCumSumS, SEXP combZPoint
 	double *gridCur = REAL(gridCurS);
 	double maxWin = REAL(maxWinS)[0];
 	long long i, j, jMax, bestWinI, bestWinJ;
-	double nCas, nObs, pNObs, Rij, bestWinR, bestWinRAbs;
+	double nCas, nObs, nCon, pNObs, Rij, bestWinR, bestWinRAbs, pij;
 	SEXP newRes;
 	PROTECT(newRes = allocMatrix(REALSXP, gridCurMaxInd, 3));
 	double *newResPtr = REAL(newRes);
+	
+	if(p=0)	p=10^(-6);
+	if(p=1)	p=1-10^(-6);
+	double logp = log(p);
+	double logomp = log(1-p);
 	
 	for(i=0.0; i<gridCurMaxInd; i++) {
 		jMax = i + maxWin;
@@ -170,23 +175,20 @@ SEXP ScanStatNewCompBinomC(SEXP combZCumSumS, SEXP combXCumSumS, SEXP combZPoint
 			}
 			else {
 				nCas = combZCumSum[j]-combZCumSum[i]+combZPoint[i];
-				pNObs = p*nObs;
-				if(nCas < pNObs){
-					Rij = pbinom(nCas, nObs, p, 1,1);
-					Rij = qnorm(Rij, 0,1,1,1);
-					if(R_FINITE(Rij) == 0) Rij=0;
-				}
-				else {
-					Rij = pbinom(nCas, nObs, p, 0,1);
-					Rij = qnorm(Rij, 0,1,0,1);
-					if(R_FINITE(Rij) == 0) Rij=0;
+				nCon = nObs - nCas;
+				pij = nCas/nObs;
+				if(pij == 0)	pij = 10^(-6);
+				if(pij == 1)	pij = 1- 10^(-6);
+				Rij = nCas*(log(pij)-logp) + nCon*(log(1-pij)-logomp);
+				if(Rij < 0) {
+					Rij = 0;
 				}
 			}
-			if(fabs(Rij) > bestWinRAbs) {
+			if(Rij > bestWinRAbs) {
 				bestWinI = i;
 				bestWinJ = j;
 				bestWinR = Rij;
-				bestWinRAbs = fabs(bestWinR);
+				bestWinRAbs = bestWinR;
 			}
 		}
 		newResPtr[i] = gridCur[bestWinI];
@@ -225,7 +227,12 @@ SEXP ScanStatRefineCompBinomC(SEXP combZCumSumS, SEXP combXCumSumS, SEXP combZPo
 	double maxWin = REAL(maxWinS)[0];
 	double jMin, gridLL, gridLR, gridRL, gridRR;
 	long long i, j, nRows, bestWinI, bestWinJ, rCt;
-	double nCas, nObs, pNObs, Rij, bestWinR, bestWinRAbs;
+	double nCas, nObs, nCon, pNObs, Rij, bestWinR, bestWinRAbs, pij;
+	
+	if(p==0)	p=10^(-6);
+	if(p==1)	p=1-10^(-6);
+	double logp = log(p);
+	double logomp = log(1-p);
 
 	gridLL = gridL - floor(maxWin/2);
 	if(gridLL < 0) {
@@ -269,23 +276,20 @@ SEXP ScanStatRefineCompBinomC(SEXP combZCumSumS, SEXP combXCumSumS, SEXP combZPo
 			}
 			else {
 				nCas = combZCumSum[j]-combZCumSum[i]+combZPoint[i];
-				pNObs = p*nObs;
-				if(nCas < pNObs){
-					Rij = pbinom(nCas, nObs, p, 1,1);
-					Rij = qnorm(Rij, 0,1,1,1);
-					if(R_FINITE(Rij) == 0) Rij=0;
-				}
-				else {
-					Rij = pbinom(nCas, nObs, p, 0,1);
-					Rij = qnorm(Rij, 0,1,0,1);
-					if(R_FINITE(Rij) == 0) Rij=0;
+				nCon = nObs - nCas;
+				pij = nCas/nObs;
+				if(pij == 0)	pij = 10^(-6);
+				if(pij == 1)	pij = 1- 10^(-6);
+				Rij = nCas*(log(pij)-logp) + nCon*(log(1-pij)-logomp);
+				if(Rij < 0) {
+					Rij = 0;
 				}
 			}
-			if(fabs(Rij) > bestWinRAbs) {
+			if(Rij > bestWinRAbs) {
 				bestWinI = i;
 				bestWinJ = j;
 				bestWinR = Rij;
-				bestWinRAbs = fabs(bestWinR);
+				bestWinRAbs = bestWinR;
 			}
 		}
 		newResPtr[rCt] = gridCur[bestWinI];
@@ -630,7 +634,7 @@ double dBetaMixEval(double x, double *betaParam1, double *betaParam2, double *wk
 double rtBetaMixCDF(double pRoot, double *betaParam1, double *betaParam2, double *wks, long nMix, double epsCDF) {
 	// Newton-Raphson with Bisection Safety Mechanism
 	// Concepts of Numerical Recipes 3rd edition used
-	const int maxIter=1000;
+	const int maxIter=100;
 	double x1 = 0;
 	double x2 = 1;
 	double xl = x1;

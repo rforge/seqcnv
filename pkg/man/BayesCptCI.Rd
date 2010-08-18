@@ -8,7 +8,7 @@ Bayesian Point-wise Confidence Interval for Change-Point Model
 This algorithm computes a point-wise Bayesian CI for the p parameter in change-point model on binomial process.
 }
 \usage{
-BayesCptCI(cases, controls, CBSRes, stepSize=5, alpha=0.05, epsilon=10^-4, epsCDF=10^-4, verbose=FALSE)
+BayesCptCI(cases, controls, CBSRes, stepSize="adaptive", adaptMaxMix=80, alpha=0.05, epsilon=10^-4, epsCDF=10^-4, verbose=FALSE)
 }
 \arguments{
   \item{cases}{
@@ -21,7 +21,10 @@ A numeric vector of the control/normal reads
 Output from the ScanCBS algorithm on this case/control data
 }
   \item{stepSize}{
-An actual point-wise computation is time-consuming; by using stepSize = n, a Bayesian CI is computed at every n reads. Default to 5. For better speed, set to 10. Set to 1 for true point-wise CI.
+An actual point-wise computation is time-consuming; by using stepSize = n, a Bayesian CI is computed at every n reads. The adaptive option gives good computational speed by choosing stepSize based on the data.
+}
+	\item{adaptMaxMix}{
+An upper bound for the number of unique weights calculated at each change point under the adaptive method. The default is 80 for an average of approximately 5000 mixture components at each point.
 }
   \item{alpha}{
 Defaults to 0.05 for the usual CI.
