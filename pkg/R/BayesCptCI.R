@@ -167,12 +167,12 @@ function(cases, controls, CBSRes, stepSize="adaptive", adaptMaxMix=80, alpha=0.0
 			wkR = as.numeric(sapply(wkRes[[j]][6,0:(k-1)], function(yy) {yy*wkRes[[j+1]][6,]}))
 			wkLR = c(wkL, wkR)
 			wkLR = wkLR/sum(wkLR)
-			mixStruct[[counter]] = rbind(c(casParamL, casParamR), c(conParamL, conParamR), wkLR)
+			mixStruct[[counter]] = matrix(rbind(c(casParamL, casParamR), c(conParamL, conParamR), wkLR), ncol=length(wkLR))
 			counter = counter+1
 		}
 	}
 	### Now for the very last one
-	mixStruct[[counter]] = wkRes[[nTauHatReal+1]][4:6,]
+	mixStruct[[counter]] = matrix(wkRes[[nTauHatReal+1]][4:6,], ncol=ncol(wkRes[[nTauHatReal+1]]))
 	mixStruct[[counter]][3,] = mixStruct[[counter]][3,]/sum(mixStruct[[counter]][3,])
 	timeCIMix = timeCIMix + proc.time()[3] - temp
 	if(verbose) {

@@ -149,15 +149,35 @@ SEXP ScanStatNewCompBinomC(SEXP combZCumSumS, SEXP combXCumSumS, SEXP combZPoint
 	double *gridCur = REAL(gridCurS);
 	double maxWin = REAL(maxWinS)[0];
 	long long i, j, jMax, bestWinI, bestWinJ;
-	double nCas, nObs, nCon, pNObs, Rij, bestWinR, bestWinRAbs, pij;
+	double nCas, nObs, nCon, pNObs, nCasTot, nConTot, nCasOut, nConOut, pOut, Rij, bestWinR, pij, l0;
 	SEXP newRes;
 	PROTECT(newRes = allocMatrix(REALSXP, gridCurMaxInd, 3));
 	double *newResPtr = REAL(newRes);
+	int newIter = 1;
 	
-	if(p=0)	p=10^(-6);
-	if(p=1)	p=1-10^(-6);
-	double logp = log(p);
-	double logomp = log(1-p);
+	nCasTot = combZCumSum[length(combZCumSumS)-1];
+	nConTot = nTotal - nCasTot;
+	if(p != 0 && p != 1) {
+		l0 = nCasTot*log(p) + nConTot*log(1-p);
+	}
+	else {
+		l0 = 0;
+	}
+	
+	/*
+	if(p<=0) {
+		logp=0;
+	}
+	else {
+		logp = log(p);
+	}
+	if(p>=1) {
+		logomp = 0;
+	}
+	else {
+		logomp = log(1-p);
+	}
+	*/
 	
 	for(i=0.0; i<gridCurMaxInd; i++) {
 		jMax = i + maxWin;
@@ -167,30 +187,33 @@ SEXP ScanStatNewCompBinomC(SEXP combZCumSumS, SEXP combXCumSumS, SEXP combZPoint
 		bestWinI = i;
 		bestWinJ = jMax;
 		bestWinR = 0.0;
-		bestWinRAbs = 0.0;
+		newIter = 1;
 		for(j=i+1; j<=jMax; j++) {
 			nObs = combXCumSum[j]-combXCumSum[i]+combXPoint[i];
-			if (nObs == 0.0) {
-				Rij = 0.0;
-			}
-			else {
+			if (nObs != 0.0) {
 				nCas = combZCumSum[j]-combZCumSum[i]+combZPoint[i];
 				nCon = nObs - nCas;
+				nCasOut = nCasTot - nCas;
+				nConOut = nConTot - nCon;
+				pOut = nCasOut/(nCasOut + nConOut);
 				pij = nCas/nObs;
-				if(pij == 0)	pij = 10^(-6);
-				if(pij == 1)	pij = 1- 10^(-6);
-				Rij = nCas*(log(pij)-logp) + nCon*(log(1-pij)-logomp);
-				if(Rij < 0) {
-					Rij = 0;
+				Rij = 0;
+				if(pOut != 0 && pOut != 1) {
+					Rij += nCasOut*log(pOut) + nConOut*log(1-pOut);
 				}
-			}
-			if(Rij > bestWinRAbs) {
-				bestWinI = i;
-				bestWinJ = j;
-				bestWinR = Rij;
-				bestWinRAbs = bestWinR;
+				if(pij != 0 && pij != 1) {
+					Rij += nCas*log(pij) + nCon*log(1-pij);
+				}
+				if(Rij > bestWinR || newIter == 1) {
+					bestWinI = i;
+					bestWinJ = j;
+					bestWinR = Rij;
+				}
+				newIter = 0;
 			}
 		}
+		bestWinR = bestWinR - l0;
+		if(bestWinR < 0)	bestWinR = 0;
 		newResPtr[i] = gridCur[bestWinI];
 		newResPtr[i + gridCurMaxInd] = gridCur[bestWinJ];
 		newResPtr[i + 2*gridCurMaxInd] = bestWinR;
@@ -227,12 +250,32 @@ SEXP ScanStatRefineCompBinomC(SEXP combZCumSumS, SEXP combXCumSumS, SEXP combZPo
 	double maxWin = REAL(maxWinS)[0];
 	double jMin, gridLL, gridLR, gridRL, gridRR;
 	long long i, j, nRows, bestWinI, bestWinJ, rCt;
-	double nCas, nObs, nCon, pNObs, Rij, bestWinR, bestWinRAbs, pij;
+	double nCas, nObs, nCon, pNObs, nCasTot, nConTot, nCasOut, nConOut, nTotOut, pOut, Rij, bestWinR, pij, l0;
+	int newIter;
 	
-	if(p==0)	p=10^(-6);
-	if(p==1)	p=1-10^(-6);
-	double logp = log(p);
-	double logomp = log(1-p);
+	nCasTot = combZCumSum[length(combZCumSumS)-1];
+	nConTot = nTotal - nCasTot;
+	if(p != 0 && p != 1) {
+		l0 = nCasTot*log(p) + nConTot*log(1-p);
+	}
+	else {
+		l0 = 0;
+	}
+	
+	/*
+	if(p<=0) {
+		logp=0;
+	}
+	else {
+		logp = log(p);
+	}
+	if(p>=1) {
+		logomp = 0;
+	}
+	else {
+		logomp = log(1-p);
+	}
+	*/
 
 	gridLL = gridL - floor(maxWin/2);
 	if(gridLL < 0) {
@@ -268,30 +311,33 @@ SEXP ScanStatRefineCompBinomC(SEXP combZCumSumS, SEXP combXCumSumS, SEXP combZPo
 		bestWinI = i;
 		bestWinJ = gridRR;
 		bestWinR = 0.0;
-		bestWinRAbs = 0.0;
+		newIter = 1;
 		for(j=jMin; j<=gridRR; j++) {
 			nObs = combXCumSum[j]-combXCumSum[i]+combXPoint[i];
-			if (nObs == 0.0) {
-				Rij = 0.0;
-			}
-			else {
+			if (nObs != 0.0) {
 				nCas = combZCumSum[j]-combZCumSum[i]+combZPoint[i];
 				nCon = nObs - nCas;
+				nCasOut = nCasTot - nCas;
+				nConOut = nConTot - nCon;
+				pOut = nCasOut/(nCasOut + nConOut);
 				pij = nCas/nObs;
-				if(pij == 0)	pij = 10^(-6);
-				if(pij == 1)	pij = 1- 10^(-6);
-				Rij = nCas*(log(pij)-logp) + nCon*(log(1-pij)-logomp);
-				if(Rij < 0) {
-					Rij = 0;
+				Rij = 0;
+				if(pOut != 0 && pOut != 1) {
+					Rij += nCasOut*log(pOut) + nConOut*log(1-pOut);
 				}
-			}
-			if(Rij > bestWinRAbs) {
-				bestWinI = i;
-				bestWinJ = j;
-				bestWinR = Rij;
-				bestWinRAbs = bestWinR;
+				if(pij != 0 && pij != 1) {
+					Rij += nCas*log(pij) + nCon*log(1-pij);
+				}
+				if(Rij > bestWinR || newIter == 1) {
+					bestWinI = i;
+					bestWinJ = j;
+					bestWinR = Rij;
+				}
+				newIter = 0;
 			}
 		}
+		bestWinR = bestWinR - l0;
+		if(bestWinR < 0)	bestWinR = 0;
 		newResPtr[rCt] = gridCur[bestWinI];
 		newResPtr[rCt + nRows] = gridCur[bestWinJ];
 		newResPtr[rCt + 2*nRows] = bestWinR;

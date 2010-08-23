@@ -87,17 +87,24 @@ function(filePrefix, chromosomeN, distMetric=c(20,50,100,150,200,300,500,1000), 
 			nTrueTau2 = length(trueTau[[i]][[j]])
 			nCBSCall2 = length(tauHatCBS[[i]][[j]])
 			nSegCall2 = length(tauHatSeg[[i]][[j]])
-			nTrueTau[i] = nTrueTau[i]+nTrueTau2/nRepeat
-			nCBSCall[i] = nCBSCall[i]+nCBSCall2/nRepeat
-			nSegCall[i] = nSegCall[i]+nSegCall2/nRepeat
+			nTrueTau[i] = nTrueTau[i]+nTrueTau2
+			nCBSCall[i] = nCBSCall[i]+nCBSCall2
+			nSegCall[i] = nSegCall[i]+nSegCall2
 			nCBSTruePos = sapply(distMetric, function(x) {sum(CBSMatchDist[[i]][[j]] <= x)})
 			nSegTruePos = sapply(distMetric, function(x) {sum(SegMatchDist[[i]][[j]] <= x)})
-			CBSRecall[i,] = CBSRecall[i,]+(nCBSTruePos/nTrueTau2)/nRepeat
-			CBSPrecision[i,] = CBSPrecision[i,]+(nCBSTruePos/nCBSCall2)/nRepeat
-			SegRecall[i,] = SegRecall[i,]+(nSegTruePos/nTrueTau2)/nRepeat
-			SegPrecision[i,] = SegPrecision[i,]+(nSegTruePos/nSegCall2)/nRepeat
+			CBSRecall[i,] = CBSRecall[i,]+nCBSTruePos
+			CBSPrecision[i,] = CBSPrecision[i,]+nCBSTruePos
+			SegRecall[i,] = SegRecall[i,]+nSegTruePos
+			SegPrecision[i,] = SegPrecision[i,]+nSegTruePos
 			CBSTime[i] = CBSTime[i] + simCBS[[i]][[j]]$timingRes$timeCBSTotal/nRepeat
 		}
+		CBSRecall[i,] = CBSRecall[i,]/nTrueTau[i]
+		CBSPrecision[i,] = CBSPrecision[i,]/nCBSCall[i]
+		SegRecall[i,] = SegRecall[i,]/nTrueTau[i]
+		SegPrecision[i,] = SegPrecision[i,]/nSegCall[i]
+		nTrueTau[i] = nTrueTau[i]/nRepeat
+		nCBSCall[i] = nCBSCall[i]/nRepeat
+		nSegCall[i] = nSegCall[i]/nRepeat
 	}
 	CBSFMeasure = 2*CBSPrecision*CBSRecall/(CBSPrecision+CBSRecall)
 	SegFMeasure = 2*SegPrecision*SegRecall/(SegPrecision+SegRecall)
