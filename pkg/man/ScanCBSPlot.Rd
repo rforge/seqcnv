@@ -8,7 +8,7 @@ Main Plotting of the scan statistic segmentation
 This is an overall plotting function to display the segmentation for a chromosome
 }
 \usage{
-ScanCBSPlot(cases, controls, CBSObj, filename, mainTitle, CIObj=NULL, length.out=10000, localWindow=0.5*10^5, localSeperatePlot=TRUE, smoothF=0.025, xlabScale=10^6, width=12, height=18)
+ScanCBSPlot(cases, controls, CBSObj, filename, mainTitle, CIObj=NULL, length.out=10000, localWindow=0.5*10^5, localSeparatePlot=TRUE, smoothF=0.025, xlabScale=10^6, width=12, height=18)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -36,7 +36,7 @@ The number of windows to use for the display of smoothed rate estimates
   \item{localWindow}{
 The number of genome locations to show around each of the called change points
 }
-	\item{localSeperatePlot}{
+	\item{localSeparatePlot}{
 Whether to show the local behavior of each change point in a seperate PDF file. Default to TRUE. The output file are the given filename attached with the index and actual location of the change point.
 }
   \item{smoothF}{

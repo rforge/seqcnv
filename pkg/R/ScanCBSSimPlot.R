@@ -1,5 +1,5 @@
 ScanCBSSimPlot <-
-function(cases, controls, CBSObj, trueTau, SpikeMat, filename, mainTitle, CIObj=NULL, length.out=10000, localWindow=0.5*10^5, localSeperatePlot=TRUE, smoothF=0.025, xlabScale=10^6, width=12, height=18) {
+function(cases, controls, CBSObj, trueTau, SpikeMat, filename, mainTitle, CIObj=NULL, length.out=10000, localWindow=0.5*10^5, localSeparatePlot=TRUE, smoothF=0.025, xlabScale=10^6, width=12, height=18) {
 	p = length(cases)/(length(cases)+length(controls))
 	maxCase = max(cases)
 	maxControl = max(controls)
@@ -9,7 +9,6 @@ function(cases, controls, CBSObj, trueTau, SpikeMat, filename, mainTitle, CIObj=
 	tauHat = tauHatFull[c(-1, -length(tauHatFull))]
 	relCN = CBSObj$relCN
 	ylims = c(min(c(0, cpts[,3])), max(c(0, cpts[,3])))
-	relCNlims = c(min(relCN), max(relCN))
 	if(!is.null(CIObj)) {
 		CIBounds = CIObj$CIRes[3:4,]
 		CIL = as.numeric(CIObj$CIRes[5,])
@@ -29,6 +28,9 @@ function(cases, controls, CBSObj, trueTau, SpikeMat, filename, mainTitle, CIObj=
 	PInGrid = casesCountInGrid/(casesCountInGrid+controlCountInGrid)
 	PInGrid[is.nan(PInGrid)]=0
 	PInGridSmooth = lowess(x=grid.fix, y=PInGrid, smoothF)
+	relCNInGrid = PInGrid/(1-PInGrid)/(p/(1-p))
+	relCNInGrid[is.nan(relCNInGrid) | !is.finite(relCNInGrid)]=0
+	relCNlims = c(0, max(max(relCN), max(relCNInGrid)))
 	tauHatInGrid = grid.fix[tauHat %/% gridSize]/xlabScale
 	trueTauInGrid = grid.fix[trueTau %/% gridSize]/xlabScale
 	gridYLims = c(min(log(casesCountInGrid+1) - log(controlCountInGrid+1)), log(max(casesCountInGrid, controlCountInGrid)))
@@ -57,9 +59,10 @@ function(cases, controls, CBSObj, trueTau, SpikeMat, filename, mainTitle, CIObj=
 	
 	plotTauHat=cbind(c(1,tauHat), c(tauHat, maxVal))
 	plot(x=grid.fix/xlabScale, y=rep(0, length(grid.fix)), type="n", ylim=relCNlims, main="Relative Copy Number", ylab="Relative CN", xlab=paste("Base Pairs", xlabScale))
+	points(x=grid.fix/xlabScale, y=relCNInGrid, pch=".", col=1)
 	for(i in 1:nrow(plotTauHat)) {
 		plotx = c(grid.fix[max(floor(plotTauHat[i,1]/gridSize), 1)]/xlabScale, grid.fix[ceiling(plotTauHat[i,2]/gridSize)]/xlabScale)
-		lines(x=plotx, y=rep(relCN[i], 2), lwd=3)
+		lines(x=plotx, y=rep(relCN[i], 2), col=2, lwd=3)
 	}
 	abline(v=tauHatInGrid, lty=3, col=4)
 	abline(v=trueTauInGrid, lty=3, col=2)
@@ -67,14 +70,14 @@ function(cases, controls, CBSObj, trueTau, SpikeMat, filename, mainTitle, CIObj=
 	
 	## 2. Plot Local View of each Change Point
 	nTauHat = length(tauHat)
-	if(localSeperatePlot == FALSE) {
+	if(localSeparatePlot == FALSE) {
 		nPlotCol = as.integer(sqrt(nTauHat/(height/width)))
 		nPlotRow = ceiling(nTauHat/nPlotCol)
 		pdf(paste(filename, "_localDetails.pdf", sep=""), width=width*2, height=height*2)
 		par(mfrow=c(nPlotRow, nPlotCol))
 	}
 	for(i in 1:nTauHat) {
-		if(localSeperatePlot) {
+		if(localSeparatePlot) {
 			pdf(paste(filename, "_local_", i, "_", tauHat[i], ".pdf", sep=""), width=width, height=height/2)
 		}
 		lBound = max(0, tauHat[i]-localWindow)
@@ -114,9 +117,9 @@ function(cases, controls, CBSObj, trueTau, SpikeMat, filename, mainTitle, CIObj=
 		}
 		abline(v=tauHat, lty=3, col=4)
 		abline(v=trueTau, lty=3, col=2)
-		if(localSeperatePlot) {
+		if(localSeparatePlot) {
 			dev.off()
 		}
 	}
-	if(localSeperatePlot == FALSE)	dev.off()
+	if(localSeparatePlot == FALSE)	dev.off()
 }

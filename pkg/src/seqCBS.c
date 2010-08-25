@@ -24,7 +24,7 @@ SEXP CombineSortedVectorC(SEXP casesS, SEXP controlsS) {
 	double *controls = REAL(controlsS);
 	long long nCas = length(casesS);
 	long long nCon = length(controlsS);
-	long long nTot = nCas+nCon;
+	long long nTot = nCas + nCon;
 	SEXP combCC;
 	PROTECT(combCC = allocVector(REALSXP, nTot));
 	double *combCCPtr = REAL(combCC);
@@ -726,7 +726,8 @@ double rtBetaMixCDF(double pRoot, double *betaParam1, double *betaParam2, double
 		else {
 			xh=rts;
 		}
-	}	
+	}
+	return(rts);
 }
 
 SEXP BayesCptCICompC(SEXP betaParam1S, SEXP betaParam2S, SEXP wksS, SEXP alphaS, SEXP epsCDFS) {
@@ -735,7 +736,6 @@ SEXP BayesCptCICompC(SEXP betaParam1S, SEXP betaParam2S, SEXP wksS, SEXP alphaS,
 	double *wks = REAL(wksS);
 	double alpha = REAL(alphaS)[0];
 	double epsCDF = REAL(epsCDFS)[0];
-	long i, j;
 	long nMix = length(betaParam1S);
 	double pLow = alpha/2;
 	double pHigh = 1.0 - pLow;
