@@ -8,6 +8,7 @@ function(cases, controls, CBSObj, filename, mainTitle, CIObj=NULL, length.out=10
 	tauHatFull = CBSObj$tauHat
 	tauHat = tauHatFull[c(-1, -length(tauHatFull))]
 	relCN = CBSObj$relCN
+	relCN[relCN <= 0] = 1
 	ylims = c(min(c(0, cpts[,3])), max(c(0, cpts[,3])))
 	if(!is.null(CIObj)) {
 		CIBounds = CIObj$CIRes[3:4,]
@@ -28,8 +29,9 @@ function(cases, controls, CBSObj, filename, mainTitle, CIObj=NULL, length.out=10
 	PInGrid = casesCountInGrid/(casesCountInGrid+controlCountInGrid)
 	PInGrid[is.nan(PInGrid)]=0
 	relCNInGrid = PInGrid/(1-PInGrid)/(p/(1-p))
-	relCNInGrid[is.nan(relCNInGrid) | !is.finite(relCNInGrid)]=0
-	relCNlims = c(0, max(max(relCN), max(relCNInGrid)))
+	relCNInGrid[is.nan(relCNInGrid) | !is.finite(relCNInGrid) | relCNInGrid <= 0]=1
+	relCNInGrid = log(relCNInGrid, base=2)
+	relCNlims = c(min(min(log(relCN, base=2)), min(relCNInGrid)), max(max(log(relCN, base=2)), max(relCNInGrid)))
 	PInGridSmooth = lowess(x=grid.fix, y=PInGrid, smoothF)
 	tauHatInGrid = grid.fix[tauHat %/% gridSize]/xlabScale
 	gridYLims = c(min(log(casesCountInGrid+1) - log(controlCountInGrid+1)), log(max(casesCountInGrid, controlCountInGrid)))
@@ -51,11 +53,11 @@ function(cases, controls, CBSObj, filename, mainTitle, CIObj=NULL, length.out=10
 	legend("topright", c("case","control", "case-control"), pch=".", lty=c(1,1,0), col=c(2,1,1))
 	
 	plotTauHat=cbind(c(1,tauHat), c(tauHat, maxVal))
-	plot(x=grid.fix/xlabScale, y=rep(0, length(grid.fix)), type="n", ylim=relCNlims, main="Relative Copy Number", ylab="Relative CN", xlab=paste("Base Pairs", xlabScale))
-	points(x=grid.fix/xlabScale, y=relCNInGrid, pch=".", col=1)
+	plot(x=grid.fix/xlabScale, y=rep(0, length(grid.fix)), type="n", ylim=relCNlims, main="Log Relative Copy Number", ylab="Log2 Relative CN", xlab=paste("Base Pairs", xlabScale))
+	points(x=grid.fix/xlabScale, y=relCNInGrid, pch=20, col=1)
 	for(i in 1:nrow(plotTauHat)) {
 		plotx = c(grid.fix[max(floor(plotTauHat[i,1]/gridSize), 1)]/xlabScale, grid.fix[ceiling(plotTauHat[i,2]/gridSize)]/xlabScale)
-		lines(x=plotx, y=rep(relCN[i], 2), col=2, lwd=3)
+		lines(x=plotx, y=rep(log(relCN[i], base=2), 2), col=2, lwd=3)
 	}
 	dev.off()
 	
