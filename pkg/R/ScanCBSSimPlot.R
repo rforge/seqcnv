@@ -37,6 +37,11 @@ function(cases, controls, CBSObj, trueTau, SpikeMat, filename, mainTitle, CIObj=
 	trueTauInGrid = grid.fix[trueTau %/% gridSize]/xlabScale
 	gridYLims = c(min(log(casesCountInGrid+1) - log(controlCountInGrid+1)), log(max(casesCountInGrid, controlCountInGrid)))
 	
+	plotTauHatInd = c(min(min(cases),min(controls)), tauHat, maxVal) %/% gridSize
+	plotTauHatInd = sapply(plotTauHatInd, function(x) {max(x,1)})
+	plotTauHatInd = sapply(plotTauHatInd, function(x) {min(x,max(grid.fix))})
+	plotTauHat = grid.fix[plotTauHatInd]/xlabScale
+	
 	## 1. Plot the chromosome global view
 	pdf(paste(filename, ".pdf", sep=""), width=width, height=height)
 	par(mfrow=c(3,1))
@@ -59,13 +64,8 @@ function(cases, controls, CBSObj, trueTau, SpikeMat, filename, mainTitle, CIObj=
 	abline(v=trueTauInGrid, lty=3, col=2)
 	legend("topright", c("case","control", "case-control"), pch=".", lty=c(1,1,0), col=c(2,1,1))
 	
-	plotTauHat=cbind(c(1,tauHat), c(tauHat, maxVal))
-	plot(x=grid.fix/xlabScale, y=rep(0, length(grid.fix)), type="n", ylim=relCNlims, main="Log Relative Copy Number", ylab="Log2 Relative CN", xlab=paste("Base Pairs", xlabScale))
-	points(x=grid.fix/xlabScale, y=relCNInGrid, pch=20, col=1)
-	for(i in 1:nrow(plotTauHat)) {
-		plotx = c(grid.fix[max(floor(plotTauHat[i,1]/gridSize), 1)]/xlabScale, grid.fix[ceiling(plotTauHat[i,2]/gridSize)]/xlabScale)
-		lines(x=plotx, y=rep(log(relCN[i], base=2), 2), col=2, lwd=3)
-	}
+	plot(x=grid.fix/xlabScale, y=relCNInGrid, type="p", pch=20, ylim=relCNlims, main="Log Relative Copy Number", ylab="Log2 Relative CN", xlab=paste("Base Pairs", xlabScale))
+	lines(x=plotTauHat, y=log(c(relCN, relCN[length(relCN)]), base=2), type="s", col="red")
 	abline(v=tauHatInGrid, lty=3, col=4)
 	abline(v=trueTauInGrid, lty=3, col=2)
 	dev.off()
@@ -95,30 +95,46 @@ function(cases, controls, CBSObj, trueTau, SpikeMat, filename, mainTitle, CIObj=
 		pInGrid[is.nan(pInGrid)] = 0.0
 		
 		combLocalCasCon = CombineCaseControlC(localCas, localCon)
-		plotReadX = combLocalCasCon$combL
-		plotReadY = combLocalCasCon$combZ/combLocalCasCon$combX
+		plotReadRangeInd = combLocalCasCon$combL >= lBound & combLocalCasCon$combL <= rBound
+		plotReadX = combLocalCasCon$combL[plotReadRangeInd]
+		plotReadY = combLocalCasCon$combZ[plotReadRangeInd] > 0
 		
 		plotPX = cbind(tauHatFull[-length(tauHatFull)], tauHatFull[-1])
 		pSegment = relCN*p/(1-p)/(1+relCN*p/(1-p))
 		plotPY = cbind(pSegment, pSegment)
 		
-		plot(x=plotReadX, y=plotReadY, pch=".", xlim=c(lBound, rBound), ylim=c(0,1), main=paste("Reads and Inference around", tauHat[i]), xlab="Base Pair Locations", ylab="p(case read)", cex.main=0.75, cex.lab=0.5, cex.axis=0.5)
-		if(length(grid.mpt) != length(pInGrid)) {
-			grid.mpt = grid.mpt[1:max(length(grid.mpt), length(pInGrid))]
-			pInGrid = pInGrid[1:max(length(grid.mpt), length(pInGrid))]
-		}
-		points(x=grid.mpt, y=pInGrid, pch=20, col=3)
 		if(!is.null(CIObj)) {
+			localCIBounds = (CIBounds[1,] <= rBound) & (CIBounds[2,] >= lBound)
+			localYLims = c(min(CIL[localCIBounds]), max(CIU[localCIBounds])) * c(0.8, 1.2)
+			if(is.nan(localYLims[1]) || !is.finite(localYLims[1]))	localYLims[1] = 0
+			if(is.nan(localYLims[2]) || !is.finite(localYLims[2]))	localYLims[2] = 1
+		}
+		else {
+			localYLims = c(0,1)
+		}
+		
+		plot(x=1, y=1, type="n", xlim=c(lBound, rBound), xaxt="n", ylim=localYLims, main=paste("Reads and Inference around", tauHat[i]), xlab="Base Pair Locations", ylab="p(case read)", cex.main=0.75, cex.lab=0.75, cex.axis=0.75)
+		axis(side=1, at=plotReadX[!plotReadY], labels=FALSE, tcl=0.3)
+		axis(side=3, at=plotReadX[plotReadY], labels=FALSE, tcl=0.3)
+		axis(side=1, xaxp=c(lBound, rBound, 10), tcl=-0.5, cex.axis=0.75)
+		if(is.null(CIObj)) {
+			if(length(grid.mpt) != length(pInGrid)) {
+				grid.mpt = grid.mpt[1:max(length(grid.mpt), length(pInGrid))]
+				pInGrid = pInGrid[1:max(length(grid.mpt), length(pInGrid))]
+			}
+			points(x=grid.mpt, y=pInGrid, pch=20, col=3)
+		}
+		else {
 			for(j in 1:ncol(CIBounds)) {
-				lines(x=CIBounds[,j], y=rep(CIL[j],2), col=4, lwd=2)
-				lines(x=CIBounds[,j], y=rep(CIU[j],2), col=2, lwd=2)
+				lines(x=CIBounds[,j], y=rep(CIL[j],2), col="#AAAAAA", lwd=2)
+				lines(x=CIBounds[,j], y=rep(CIU[j],2), col="#AAAAAA", lwd=2)
 			}
 		}
 		for(j in 1:nrow(plotPY)) {
-			lines(x=plotPX[j,], y=plotPY[j,], lwd=2.5)
+			lines(x=plotPX[j,], y=plotPY[j,], lwd=3)
 		}
-		abline(v=tauHat, lty=3, col=4)
-		abline(v=trueTau, lty=3, col=2)
+		abline(v=tauHat, lty=3, lwd=2, col="#AAAAAA")
+		abline(v=trueTau, lty=2, lwd=2, col="#777777")
 		if(localSeparatePlot) {
 			dev.off()
 		}
