@@ -1,6 +1,5 @@
 nhppSimConstWindowAnalysis <-
 function(filePrefix, chromosomeN, distMetric=c(20,50,100,150,200,300,500,1000), cptLen=c(3,5,8,12,15,20,30,50,100), nPair=2, nRepeat=10, statistic="normal", grid.size="auto", takeN=5, maxNCut=60, minStat=5, verbose=FALSE, timing=TRUE, hasRun=FALSE, width=12, height=6) {
-	library(clue)
 	nCptLen = length(cptLen)
 	tauHatCBS = vector("list", nCptLen)
 	tauHatSeg = vector("list", nCptLen)
