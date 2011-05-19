@@ -8,7 +8,7 @@ Compute the Relative Copy Number
 This computes the relative copy number by each of the segment called
 }
 \usage{
-relCNComp(combX, combZ, tauHatInd, p)
+relCNComp(combX, combZ, tauHatInd, p, alpha)
 }
 \arguments{
   \item{combX}{
@@ -22,6 +22,9 @@ The index of change points called
 }
   \item{p}{
 The overall proportion of case reads
+}
+	\item{alpha}{
+Significance level for testing whether each segment is a gain (relative CN > 1) or loss (relative CN < 1). The method internally corrects for multiple testing.
 }
 }
 \details{

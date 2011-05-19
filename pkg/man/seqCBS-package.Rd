@@ -1,6 +1,6 @@
-\name{SeqCNVCBS-package}
-\alias{SeqCNVCBS-package}
-\alias{SeqCNVCBS}
+\name{seqCBS-package}
+\alias{seqCBS-package}
+\alias{seqCBS}
 \docType{package}
 \title{
 Scan Statistics CNV detection using sequencing data
@@ -10,10 +10,10 @@ CNV detection using matched case-control sequencing read data. It gives a number
 }
 \details{
 \tabular{ll}{
-Package: \tab SeqCNVCBS\cr
+Package: \tab seqCBS\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2010-04-27\cr
+Version: \tab 1.2\cr
+Date: \tab 2011-05-18\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 }

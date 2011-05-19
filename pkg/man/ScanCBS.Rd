@@ -8,7 +8,7 @@ Main CBS Algorithm for Change-Point Detection
 This is the main algorithm. It teratively scans for window of arbitrary size where the case and control read depths are different. It continues until a stopping criterion based on mBIC, maximum number of cut, and the statistic at the current segment.
 }
 \usage{
-ScanCBS(cases, controls, statistic = "binomial", grid.size = "auto", takeN = 5, maxNCut = 100, minStat = 0, verbose = FALSE, timing = TRUE)
+ScanCBS(cases, controls, statistic = "binomial", grid.size = "auto", takeN = 5, maxNCut = 100, minStat = 0, alpha=0.05, verbose = FALSE, timing = TRUE)
 }
 \arguments{
   \item{cases}{
@@ -32,6 +32,9 @@ The maximum number of segmentation steps to perform
   \item{minStat}{
 The minimum statistic value required to continue the segmentation. Default 0 as this criterion being ignored.
 }
+	\item{alpha}{
+Significance level for testing whether each segment is a gain (relative CN > 1) or loss (relative CN < 1). The method internally corrects for multiple testing.
+}
   \item{verbose}{
 If \code{TRUE}, then will print much information on each segmentation. For diagnostics only.
 }
@@ -44,8 +47,9 @@ This algorithm is an use of the Circular Binary Segmentation method. It continue
 }
 \value{
   \item{tauHat }{The change points called}
-  \item{statHat }{A matrix containing the statistic and its segmentation for the model called}
+  \item{statHat }{A matrix containing the statistic and its segmentation for the model called, in the order of the segmentation. The columns are break points in genomic scale (1,2), read index scale (3,4), value of test statistic (5), the parent segment in genomic scale (6,7), and mBIC of the model (8).}
   \item{relCN }{The relative CN computed for each segment between change points}
+  \item{relGainLoss }{Test result of whether each segment is a gain, loss, or normal}
   \item{timingRes }{A list containing the result of the timing of this algorithm}
 }
 \references{

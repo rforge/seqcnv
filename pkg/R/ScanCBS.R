@@ -1,5 +1,5 @@
 ScanCBS <-
-function(cases, controls, statistic="binomial", grid.size="auto", takeN=5, maxNCut=100, minStat=0, verbose=FALSE, timing=TRUE) {
+function(cases, controls, statistic="binomial", grid.size="auto", takeN=5, maxNCut=100, minStat=0, alpha=0.05, verbose=FALSE, timing=TRUE) {
 	## statistic should be either "binomial" (use exact binomial distribution)
 	## "normal" (use normal approximation for all windows), or "rabinowitz" (use statistic in Rabinowitz 1994)
 	## grid.size should be either "auto" (default) or a vector of integers such as c(10000,1000,100,10)
@@ -133,23 +133,25 @@ function(cases, controls, statistic="binomial", grid.size="auto", takeN=5, maxNC
 	tauHatInd = sort(tauHat)
 	tauHat = combL[tauHatInd]
 	
-	relCN = relCNComp(combX, combZ, tauHatInd, p)
+	relCNRes = relCNComp(combX, combZ, tauHatInd, p, alpha)
+	relCN = relCNRes$relCN
+	relGainLoss = relCNRes$relGainLoss
 		
 	statHat = cbind(matrix(statHat[,1:2],nrow=nrow(statHat)), statHat)
 	statHat[,1] = combL[statHat[,1]]
 	statHat[,2] = combL[statHat[,2]]
 	statHat[,6] = combL[statHat[,6]]
 	statHat[,7] = combL[statHat[,7]]
-	colnames(statHat) = c("cptL", "cptR", "cptLRead","cptRRead", "stat", "boundL", "boundR", "BIC")
+	colnames(statHat) = c("cptL", "cptR", "cptLReadInd","cptRReadInd", "stat", "parentL", "parentR", "BIC")
 	
 	timeCBSTotal = proc.time()[3] - timeCBSTotal
 	
 	if(timing == TRUE) {
 		timingRes = list(timeCBSTotal=timeCBSTotal, timeCBSPreProcess=timeCBSPreProcess, timeCBSBreakDown=timeCBSBreakDown, timeIGSTotal=timeIGSTotal, timeIGSBreakDown=timeIGSBreakDown)
-		return(list(tauHat=tauHat, statHat = statHat, relCN = relCN, timingRes=timingRes))
+		return(list(tauHat=tauHat, statHat = statHat, relCN = relCN, relGainLoss=relGainLoss, timingRes=timingRes))
 	}
 	else {
-		return(list(tauHat=tauHat, statHat = statHat, relCN = relCN))
+		return(list(tauHat=tauHat, statHat = statHat, relCN = relCN, relGainLoss=relGainLoss))
 	}
 }
 
