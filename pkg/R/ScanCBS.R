@@ -1,5 +1,5 @@
 ScanCBS <-
-function(cases, controls, statistic="binomial", grid.size="auto", takeN=5, maxNCut=100, minStat=0, alpha=0.05, verbose=FALSE, timing=TRUE) {
+function(cases, controls, statistic="binomial", grid.size="auto", takeN=5, maxNCut=100, minStat=0, alpha=0.05, verbose=FALSE, timing=TRUE, runTillMaxCut = FALSE) {
 	## statistic should be either "binomial" (use exact binomial distribution)
 	## "normal" (use normal approximation for all windows), or "rabinowitz" (use statistic in Rabinowitz 1994)
 	## grid.size should be either "auto" (default) or a vector of integers such as c(10000,1000,100,10)
@@ -77,7 +77,7 @@ function(cases, controls, statistic="binomial", grid.size="auto", takeN=5, maxNC
 		maxS.ind = which.max(abs(maxS[,3]))
 		maxS.cut = maxS[maxS.ind,]
 		mBIC = ScanBIC(combX, combZ, sort(c(tauHat, maxS.cut[1:2])), lik0, nTotal)
-		if(mBIC < curBIC && nCut !=1) {
+		if(mBIC < curBIC && nCut !=1 && !runTillMaxCut) {
 			break
 		}
 		tauHat = c(tauHat, maxS.cut[1:2])
