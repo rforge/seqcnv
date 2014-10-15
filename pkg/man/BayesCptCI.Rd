@@ -8,7 +8,8 @@ Bayesian Point-wise Confidence Interval for Change-Point Model
 This algorithm computes a point-wise Bayesian CI for the p parameter in change-point model on binomial process.
 }
 \usage{
-BayesCptCI(cases, controls, CBSRes, stepSize="adaptive", adaptMaxMix=80, alpha=0.05, epsilon=10^-4, epsCDF=10^-4, verbose=FALSE)
+BayesCptCI(cases, controls, CBSRes, stepSize="adaptive", adaptMaxMix=80, 
+  alpha=0.05, epsilon=10^-4, epsCDF=10^-4, verbose=FALSE)
 }
 \arguments{
   \item{cases}{

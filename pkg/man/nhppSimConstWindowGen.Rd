@@ -7,7 +7,9 @@ Simulate a Non-Homogeneous PP with constant window spike
 Simulate non-homogeneous Poisson processes with a number of constant-widths windows of signal spike, and output the data and meta file
 }
 \usage{
-nhppSimConstWindowGen(controlRates, filename, chromosomeN, nSpike=25, cptLen=c(3,5,8,12,20,30,50,75,100), nPair=2, nRepeat=10, minGain=1.5, maxGain=4, minLoss=0.01, maxLoss=0.5, pGain=0.6)
+nhppSimConstWindowGen(controlRates, filename, chromosomeN, nSpike=25, 
+  cptLen=c(3,5,8,12,20,30,50,75,100), nPair=2, nRepeat=10, minGain=1.5, 
+  maxGain=4, minLoss=0.01, maxLoss=0.5, pGain=0.6)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

@@ -8,7 +8,9 @@ Main Plotting of the scan statistic segmentation
 This is an overall plotting function to display the segmentation for a chromosome
 }
 \usage{
-ScanCBSPlot(cases, controls, CBSObj, filename, mainTitle, CIObj=NULL, length.out=10000, localWindow=0.5*10^5, localSeparatePlot=TRUE, smoothF=0.025, xlabScale=10^6, width=12, height=18)
+ScanCBSPlot(cases, controls, CBSObj, filename, mainTitle, CIObj=NULL, 
+  length.out=10000, localWindow=0.5*10^5, localSeparatePlot=TRUE, 
+  smoothF=0.025, xlabScale=10^6, width=12, height=18)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

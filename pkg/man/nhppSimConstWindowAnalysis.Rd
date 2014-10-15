@@ -7,7 +7,10 @@ Analyze the performance on simulation with constant signal length in each set
 Takes the dataset and metafile output of \code{\link{nhppSimConstWindowGen}} and of SegSeq, then evaluates the performance in change-point precision and recall. The dataset must be generated in such format for this function to work.
 }
 \usage{
-nhppSimConstWindowAnalysis(filePrefix, chromosomeN, distMetric=c(20,50,100,150,200,300,500,1000), cptLen=c(3,5,8,12,15,20,30,50,100), nPair=2, nRepeat=10, statistic="normal", grid.size="auto", takeN=5, maxNCut=60, minStat=5, verbose=FALSE, timing=TRUE, hasRun=FALSE, width=12, height=6)
+nhppSimConstWindowAnalysis(filePrefix, chromosomeN, 
+  distMetric=c(20,50,100,150,200,300,500,1000), cptLen=c(3,5,8,12,15,20,30,50,100),
+   nPair=2, nRepeat=10, statistic="normal", grid.size="auto", takeN=5, maxNCut=60, 
+   minStat=5, verbose=FALSE, timing=TRUE, hasRun=FALSE, width=12, height=6)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

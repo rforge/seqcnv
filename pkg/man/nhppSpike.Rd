@@ -8,7 +8,8 @@ Spike rates of NHPP
 Randomly spike the smoothed control rate of an NHPP according to the parameters.
 }
 \usage{
-nhppSpike(smoothRates, nSpike = 25, cptLenR = 4, cptLenMean = 10, minGain = 1.5, maxGain = 10, minLoss = 0.01, maxLoss = 0.5, pGain = 0.6)
+nhppSpike(smoothRates, nSpike = 25, cptLenR = 4, cptLenMean = 10, minGain = 1.5, 
+  maxGain = 10, minLoss = 0.01, maxLoss = 0.5, pGain = 0.6)
 }
 \arguments{
   \item{smoothRates}{

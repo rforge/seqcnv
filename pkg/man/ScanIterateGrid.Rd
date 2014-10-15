@@ -8,7 +8,8 @@ Main Scan with Iterative Grid Search
 This is a computational speed-up to prevent a quadratic order computation.
 }
 \usage{
-ScanIterateGrid(combX, combZ, combL, statistic, grid.size, nGridSize, timeIGSBreakDown, takeN, verbose, timing)
+ScanIterateGrid(combX, combZ, combL, statistic, grid.size, nGridSize, 
+  timeIGSBreakDown, takeN, verbose, timing)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

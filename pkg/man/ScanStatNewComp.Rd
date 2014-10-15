@@ -8,7 +8,8 @@ Main new window scan statistics computation
 This is a wrapper function to call the C routines for the scan statistic new candidate segmentation computing from the IGS
 }
 \usage{
-ScanStatNewComp(combZCumSum, combXCumSum, combZPoint, combXPoint, p, nTotal, grid.cur, max.win, statistic)
+ScanStatNewComp(combZCumSum, combXCumSum, combZPoint, combXPoint, p, 
+	nTotal, grid.cur, max.win, statistic)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

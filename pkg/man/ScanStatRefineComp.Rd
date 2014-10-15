@@ -8,7 +8,8 @@ Main refining window scan statistics computation
 This is a wrapper function to call the C routines for the scan statistic to refine current candidate segmentations computing from the IGS
 }
 \usage{
-ScanStatRefineComp(combZCumSum, combXCumSum, combZPoint, combXPoint, p, nTotal, grid.cur, grid.LR, max.win, statistic)
+ScanStatRefineComp(combZCumSum, combXCumSum, combZPoint, combXPoint, 
+  p, nTotal, grid.cur, grid.LR, max.win, statistic)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

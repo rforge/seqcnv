@@ -8,7 +8,8 @@ Spike NHPP rate with constant window width
 Randomly spike the smoothed control rate of an NHPP according to the parameters, with constant window width.
 }
 \usage{
-nhppSpikeConstWindow(smoothRates, nSpike = 25, cptLen = 5, minGain = 1.5, maxGain = 10, minLoss = 0.01, maxLoss = 0.5, pGain = 0.6)
+nhppSpikeConstWindow(smoothRates, nSpike = 25, cptLen = 5, minGain = 1.5, 
+  maxGain = 10, minLoss = 0.01, maxLoss = 0.5, pGain = 0.6)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
